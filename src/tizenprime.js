@@ -16,9 +16,14 @@
   var state = {
     blockedRequests: 0,
     skippedPrompts: 0,
+    softAllowedRequests: 0,
     lastSkipAt: 0,
     focusedElement: null,
     lastNavigationAt: 0
+  };
+
+  var config = {
+    blockNetworkAds: false
   };
 
   var blockedHosts = [
@@ -38,17 +43,15 @@
     /(^|[/?&._-])adserver([/?&._-]|$)/i,
     /(^|[/?&._-])advertising([/?&._-]|$)/i,
     /(^|[/?&._-])ads([/?&._-]|$)/i,
-    /(^|[/?&._-])ima([/?&._-]|$)/i,
-    /(^|[/?&._-])vmap([/?&._-]|$)/i,
-    /(^|[/?&._-])vast([/?&._-]|$)/i,
-    /(^|[/?&._-])preroll([/?&._-]|$)/i,
-    /(^|[/?&._-])midroll([/?&._-]|$)/i,
-    /\/gp\/video\/ads\//i,
-    /\/video\/ads\//i,
     /\/adsdk\//i
   ];
 
   var protectedPathPatterns = [
+    /primevideo\.com/i,
+    /amazon\.com\/.*\/video/i,
+    /amazonvideo\.com/i,
+    /cloudfront\.net/i,
+    /media-amazon\.com/i,
     /(^|[/?&._-])license([/?&._-]|$)/i,
     /widevine/i,
     /playready/i,
@@ -98,7 +101,10 @@
   }
 
   function shouldBlockUrl(url) {
-    if (!url || isProtectedUrl(url)) {
+    if (!url || !config.blockNetworkAds || isProtectedUrl(url)) {
+      if (url) {
+        state.softAllowedRequests += 1;
+      }
       return false;
     }
 
@@ -297,7 +303,7 @@
 
     state.lastSkipAt = now;
     state.skippedPrompts += 1;
-    button.click();
+    pressElement(button);
     log('clicked skip/continue prompt');
   }
 
@@ -505,7 +511,75 @@
       return;
     }
 
-    state.focusedElement.click();
+    pressElement(state.focusedElement);
+  }
+
+  function dispatchMouseEvent(element, type) {
+    var rect = element.getBoundingClientRect();
+    var eventInit = {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: rect.left + rect.width / 2,
+      clientY: rect.top + rect.height / 2
+    };
+
+    try {
+      element.dispatchEvent(new MouseEvent(type, eventInit));
+    } catch (error) {
+      var event = document.createEvent('MouseEvents');
+      event.initMouseEvent(
+        type,
+        true,
+        true,
+        window,
+        1,
+        0,
+        0,
+        eventInit.clientX,
+        eventInit.clientY,
+        false,
+        false,
+        false,
+        false,
+        0,
+        null
+      );
+      element.dispatchEvent(event);
+    }
+  }
+
+  function dispatchKeyboardEvent(element, type, keyCode) {
+    try {
+      element.dispatchEvent(new KeyboardEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        keyCode: keyCode,
+        which: keyCode,
+        key: keyCode === 13 ? 'Enter' : ''
+      }));
+    } catch (error) {
+      var event = document.createEvent('Events');
+      event.initEvent(type, true, true);
+      event.keyCode = keyCode;
+      event.which = keyCode;
+      element.dispatchEvent(event);
+    }
+  }
+
+  function pressElement(element) {
+    if (!element) {
+      return;
+    }
+
+    dispatchMouseEvent(element, 'mouseover');
+    dispatchMouseEvent(element, 'mousemove');
+    dispatchMouseEvent(element, 'mousedown');
+    dispatchKeyboardEvent(element, 'keydown', 13);
+    element.click();
+    dispatchKeyboardEvent(element, 'keyup', 13);
+    dispatchMouseEvent(element, 'mouseup');
+    dispatchMouseEvent(element, 'click');
   }
 
   function installRemoteNavigation() {
@@ -584,11 +658,17 @@
       status: function () {
         return {
           blockedRequests: state.blockedRequests,
+          softAllowedRequests: state.softAllowedRequests,
           skippedPrompts: state.skippedPrompts,
-          remoteFocus: !!state.focusedElement
+          remoteFocus: !!state.focusedElement,
+          blockNetworkAds: config.blockNetworkAds
         };
       },
-      shouldBlockUrl: shouldBlockUrl
+      shouldBlockUrl: shouldBlockUrl,
+      setNetworkAdBlocking: function (enabled) {
+        config.blockNetworkAds = !!enabled;
+        return config.blockNetworkAds;
+      }
     };
   }
 

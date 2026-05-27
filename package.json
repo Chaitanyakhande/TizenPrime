@@ -1,10 +1,12 @@
 {
   "name": "tizenprime",
   "version": "0.1.0",
-  "description": "Remote-first TizenBrew app shell for Prime Video.",
-  "packageType": "app",
+  "description": "Remote-first TizenBrew Prime Video mod.",
+  "packageType": "mods",
   "appName": "TizenPrime",
-  "appPath": "app/index.html",
+  "websiteURL": "https://www.primevideo.com/",
+  "main": "src/tizenprime.js",
+  "evaluateScriptOnDocumentStart": false,
   "keys": [
     "MediaPlayPause",
     "MediaPlay",

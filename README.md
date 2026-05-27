@@ -12,6 +12,7 @@ TizenPrime is a remote-first TizenBrew app shell for Prime Video.
 
 - This is a TizenBrew web app, not Amazon's native Samsung Prime Video app.
 - Prime Video playback may still fail if Amazon requires a certified TV app, DRM path, or device-specific player.
+- The native-app button tries to find and launch the installed Samsung Prime Video app, but it cannot remove ads inside Amazon's native app.
 - The app shell is remote-first and opens Prime Video pages from large TV-friendly controls.
 
 ## Package Shape
