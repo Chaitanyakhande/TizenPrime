@@ -1,0 +1,36 @@
+{
+  "name": "tizenprime",
+  "version": "0.1.0",
+  "description": "TizenBrew site modification module for a cleaner Prime Video experience.",
+  "packageType": "mods",
+  "appName": "TizenPrime",
+  "websiteURL": "https://www.primevideo.com/",
+  "main": "src/tizenprime.js",
+  "evaluateScriptOnDocumentStart": true,
+  "keys": [
+    "MediaPlayPause",
+    "MediaPlay",
+    "MediaPause",
+    "MediaStop",
+    "MediaFastForward",
+    "MediaRewind",
+    "MediaTrackNext",
+    "MediaTrackPrevious"
+  ],
+  "files": [
+    "src",
+    "README.md",
+    "package.json"
+  ],
+  "keywords": [
+    "tizen",
+    "tizen-tv",
+    "tizenbrew",
+    "prime-video",
+    "adblock"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "check": "node --check src/tizenprime.js"
+  }
+}
