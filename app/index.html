@@ -258,10 +258,11 @@
         <button class="nav-item active" data-target="home">Home</button>
         <button class="nav-item" data-open="https://www.primevideo.com/storefront/movie/ref=atv_nb_sf_mv">Movies</button>
         <button class="nav-item" data-open="https://www.primevideo.com/storefront/tv/ref=atv_nb_sf_tv">TV Shows</button>
-        <button class="nav-item" data-open="https://www.primevideo.com/storefront/sports/ref=atv_nb_sf_spt">Sports</button>
-        <button class="nav-item" data-open="https://www.primevideo.com/storefront/channels/ref=atv_nb_sf_chn">Channels</button>
-        <button class="nav-item" data-open="https://www.primevideo.com/mytv">Register</button>
-      </nav>
+          <button class="nav-item" data-open="https://www.primevideo.com/storefront/sports/ref=atv_nb_sf_spt">Sports</button>
+          <button class="nav-item" data-open="https://www.primevideo.com/storefront/channels/ref=atv_nb_sf_chn">Channels</button>
+          <button class="nav-item" data-open="https://www.primevideo.com/mytv">Register</button>
+          <button class="nav-item" data-native-prime>Native App</button>
+        </nav>
     </aside>
 
     <main>
@@ -270,6 +271,7 @@
         <div class="actions">
           <button class="action" data-open="https://www.primevideo.com/watchlist/ref=atv_nb_wl">Watchlist</button>
           <button class="action" data-open="https://www.primevideo.com/">Prime Video</button>
+          <button class="action" data-native-prime>Native App</button>
         </div>
       </div>
 
@@ -278,6 +280,7 @@
         <p class="subtitle">A remote-first launcher for Prime pages inside TizenBrew.</p>
         <div class="hero-actions">
           <button class="hero-button primary" data-open="https://www.primevideo.com/">Open Prime</button>
+          <button class="hero-button" data-native-prime>Open Native App</button>
           <button class="hero-button" data-open="https://www.primevideo.com/mytv">Register TV</button>
         </div>
       </section>
@@ -292,6 +295,8 @@
           <button class="tile" style="--c1:#383056;--c2:#8b70ff" data-open="https://www.primevideo.com/storefront/channels/ref=atv_nb_sf_chn"><span>Channels</span></button>
         </div>
       </section>
+
+      <p id="status" class="subtitle" aria-live="polite"></p>
     </main>
   </div>
 
@@ -392,6 +397,75 @@
         window.location.href = url;
       }
 
+      function setStatus(message) {
+        var status = document.getElementById('status');
+
+        if (status) {
+          status.textContent = message;
+        }
+      }
+
+      function launchNativePrime() {
+        if (!window.tizen || !tizen.application || !tizen.application.getAppsInfo) {
+          setStatus('Native Samsung app launch is not available in this TizenBrew context.');
+          return;
+        }
+
+        setStatus('Looking for the installed Prime Video app...');
+
+        tizen.application.getAppsInfo(function (apps) {
+          var app = null;
+          var fallbackIds = [
+            'org.tizen.primevideo',
+            'org.tizen.amazonprime',
+            'org.tizen.amazonvideo',
+            'AmazonPrimeVideo',
+            'PrimeVideo'
+          ];
+
+          for (var i = 0; i < apps.length; i += 1) {
+            var label = String(apps[i].label || '').toLowerCase();
+            var id = String(apps[i].id || '').toLowerCase();
+
+            if ((label.indexOf('prime') !== -1 && label.indexOf('video') !== -1) ||
+                (id.indexOf('prime') !== -1 && id.indexOf('video') !== -1) ||
+                (id.indexOf('amazon') !== -1 && id.indexOf('video') !== -1)) {
+              app = apps[i];
+              break;
+            }
+          }
+
+          function tryLaunch(index) {
+            var id;
+
+            if (app && index === -1) {
+              id = app.id;
+            } else {
+              id = fallbackIds[index];
+            }
+
+            if (!id) {
+              setStatus('Could not find the native Prime Video app. Install it from Samsung Apps, then try again.');
+              return;
+            }
+
+            tizen.application.launch(id, function () {
+              setStatus('Opening native Prime Video...');
+            }, function () {
+              if (index === -1) {
+                tryLaunch(0);
+              } else {
+                tryLaunch(index + 1);
+              }
+            });
+          }
+
+          tryLaunch(app ? -1 : 0);
+        }, function () {
+          setStatus('Tizen did not allow app lookup from this module.');
+        });
+      }
+
       function submitFocused() {
         if (!focusedElement) {
           setFocus(elements()[0]);
@@ -408,6 +482,11 @@
 
         if (focusedElement.getAttribute('data-open')) {
           openUrl(focusedElement.getAttribute('data-open'));
+          return;
+        }
+
+        if (focusedElement.hasAttribute('data-native-prime')) {
+          launchNativePrime();
           return;
         }
 
@@ -438,12 +517,18 @@
       document.addEventListener('click', function (event) {
         var target = event.target;
 
-        while (target && target !== document.body && !target.getAttribute('data-open')) {
+        while (target &&
+            target !== document.body &&
+            !target.getAttribute('data-open') &&
+            !target.hasAttribute('data-native-prime')) {
           target = target.parentNode;
         }
 
         if (target && target.getAttribute && target.getAttribute('data-open')) {
           openUrl(target.getAttribute('data-open'));
+          event.preventDefault();
+        } else if (target && target.hasAttribute && target.hasAttribute('data-native-prime')) {
+          launchNativePrime();
           event.preventDefault();
         }
       });
