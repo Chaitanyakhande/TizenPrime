@@ -6,7 +6,7 @@
   "appName": "TizenPrime",
   "websiteURL": "https://www.primevideo.com/",
   "main": "src/tizenprime.js",
-  "evaluateScriptOnDocumentStart": true,
+  "evaluateScriptOnDocumentStart": false,
   "keys": [
     "MediaPlayPause",
     "MediaPlay",
