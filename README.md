@@ -1,6 +1,6 @@
 # TizenPrime
 
-TizenPrime is a TizenBrew site modification module for Prime Video. It injects a small cleanup script into `https://www.primevideo.com/` that blocks common ad/measurement endpoints, hides obvious ad surfaces, and clicks safe skip/continue prompts when they appear.
+TizenPrime is a remote-first TizenBrew app shell for Prime Video.
 
 ## Install
 
@@ -10,15 +10,14 @@ TizenPrime is a TizenBrew site modification module for Prime Video. It injects a
 
 ## Notes
 
-- This is a best-effort module. Prime Video can change its player and ad delivery at any time.
-- The script avoids known DRM, license, token, and device-auth URLs so normal playback is less likely to break.
-- To debug from the web console, set `window.TizenPrimeDebug = true` and inspect `window.TizenPrime.status()`.
+- This is a TizenBrew web app, not Amazon's native Samsung Prime Video app.
+- Prime Video playback may still fail if Amazon requires a certified TV app, DRM path, or device-specific player.
+- The app shell is remote-first and opens Prime Video pages from large TV-friendly controls.
 
 ## Package Shape
 
 TizenBrew reads the module metadata from `package.json`:
 
-- `packageType`: `mods`
+- `packageType`: `app`
 - `appName`: `TizenPrime`
-- `websiteURL`: `https://www.primevideo.com/`
-- `main`: `src/tizenprime.js`
+- `appPath`: `app/index.html`

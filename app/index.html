@@ -1,0 +1,455 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TizenPrime</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #05070a;
+      --panel: #111820;
+      --panel-strong: #172232;
+      --text: #f6f8fb;
+      --muted: #aeb8c6;
+      --line: #2b3948;
+      --focus: #00a8e1;
+      --accent: #f4c542;
+      --green: #24b47e;
+      --red: #ea4335;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background:
+        linear-gradient(90deg, rgba(5, 7, 10, 0.97) 0%, rgba(5, 7, 10, 0.82) 52%, rgba(5, 7, 10, 0.48) 100%),
+        url("https://m.media-amazon.com/images/G/01/digital/video/web/Logo-min.png"),
+        linear-gradient(135deg, #05070a 0%, #121b25 54%, #1d1d1b 100%);
+      background-repeat: no-repeat;
+      background-position: center, right 7vw top 9vh, center;
+      background-size: cover, min(30vw, 420px), cover;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      width: 100%;
+      height: 100%;
+    }
+
+    aside {
+      padding: 34px 22px;
+      background: rgba(8, 12, 17, 0.92);
+      border-right: 1px solid var(--line);
+    }
+
+    .brand {
+      margin: 0 0 32px;
+      font-size: 31px;
+      line-height: 1;
+      letter-spacing: 0;
+      font-weight: 700;
+    }
+
+    .brand span {
+      color: var(--focus);
+    }
+
+    nav {
+      display: grid;
+      gap: 12px;
+    }
+
+    .nav-item,
+    .action,
+    .tile,
+    .hero-button,
+    input {
+      border: 2px solid transparent;
+      outline: none;
+    }
+
+    .nav-item {
+      min-height: 56px;
+      border-radius: 6px;
+      padding: 0 18px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 23px;
+      text-align: left;
+    }
+
+    .nav-item.active {
+      color: var(--text);
+      background: var(--panel-strong);
+    }
+
+    main {
+      min-width: 0;
+      padding: 44px 54px 40px;
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(280px, 520px) auto;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 42px;
+    }
+
+    input {
+      width: 100%;
+      height: 58px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border-color: var(--line);
+      padding: 0 20px;
+      font-size: 24px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .action,
+    .hero-button {
+      min-height: 58px;
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 0 20px;
+      font-size: 22px;
+    }
+
+    .hero {
+      width: min(850px, 76vw);
+      margin-bottom: 44px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: 64px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      width: min(720px, 64vw);
+      margin: 0 0 28px;
+      color: var(--muted);
+      font-size: 27px;
+      line-height: 1.34;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+    }
+
+    .primary {
+      background: var(--text);
+      color: #05070a;
+      font-weight: 700;
+    }
+
+    .row {
+      margin-top: 22px;
+    }
+
+    .row-title {
+      margin: 0 0 14px;
+      font-size: 27px;
+      letter-spacing: 0;
+    }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(132px, 1fr));
+      gap: 14px;
+    }
+
+    .tile {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      min-height: 145px;
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 18px;
+      background: var(--panel);
+      color: var(--text);
+      text-align: left;
+      font-size: 23px;
+      font-weight: 700;
+    }
+
+    .tile::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(0deg, rgba(0, 0, 0, 0.76), rgba(0, 0, 0, 0.18)),
+        linear-gradient(135deg, var(--c1), var(--c2));
+    }
+
+    .tile span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .focus {
+      border-color: var(--focus) !important;
+      box-shadow: 0 0 0 5px rgba(0, 168, 225, 0.38) !important;
+      transform: scale(1.035);
+    }
+
+    .nav-item.focus {
+      transform: none;
+      background: var(--panel-strong);
+      color: var(--text);
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 190px 1fr;
+      }
+
+      aside {
+        padding: 24px 14px;
+      }
+
+      main {
+        padding: 30px 28px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .tiles {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <h1 class="brand">Tizen<span>Prime</span></h1>
+      <nav>
+        <button class="nav-item active" data-target="home">Home</button>
+        <button class="nav-item" data-open="https://www.primevideo.com/storefront/movie/ref=atv_nb_sf_mv">Movies</button>
+        <button class="nav-item" data-open="https://www.primevideo.com/storefront/tv/ref=atv_nb_sf_tv">TV Shows</button>
+        <button class="nav-item" data-open="https://www.primevideo.com/storefront/sports/ref=atv_nb_sf_spt">Sports</button>
+        <button class="nav-item" data-open="https://www.primevideo.com/storefront/channels/ref=atv_nb_sf_chn">Channels</button>
+        <button class="nav-item" data-open="https://www.primevideo.com/mytv">Register</button>
+      </nav>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <input id="search" type="text" placeholder="Search Prime Video" data-search>
+        <div class="actions">
+          <button class="action" data-open="https://www.primevideo.com/watchlist/ref=atv_nb_wl">Watchlist</button>
+          <button class="action" data-open="https://www.primevideo.com/">Prime Video</button>
+        </div>
+      </div>
+
+      <section class="hero">
+        <h1>Prime Video</h1>
+        <p class="subtitle">A remote-first launcher for Prime pages inside TizenBrew.</p>
+        <div class="hero-actions">
+          <button class="hero-button primary" data-open="https://www.primevideo.com/">Open Prime</button>
+          <button class="hero-button" data-open="https://www.primevideo.com/mytv">Register TV</button>
+        </div>
+      </section>
+
+      <section class="row">
+        <h2 class="row-title">Browse</h2>
+        <div class="tiles">
+          <button class="tile" style="--c1:#173b57;--c2:#00a8e1" data-open="https://www.primevideo.com/storefront/home/ref=atv_nb_sf_hm"><span>Home</span></button>
+          <button class="tile" style="--c1:#553312;--c2:#f4c542" data-open="https://www.primevideo.com/storefront/movie/ref=atv_nb_sf_mv"><span>Movies</span></button>
+          <button class="tile" style="--c1:#1f4c37;--c2:#24b47e" data-open="https://www.primevideo.com/storefront/tv/ref=atv_nb_sf_tv"><span>TV Shows</span></button>
+          <button class="tile" style="--c1:#53231d;--c2:#ea4335" data-open="https://www.primevideo.com/storefront/sports/ref=atv_nb_sf_spt"><span>Sports</span></button>
+          <button class="tile" style="--c1:#383056;--c2:#8b70ff" data-open="https://www.primevideo.com/storefront/channels/ref=atv_nb_sf_chn"><span>Channels</span></button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      var focusClass = 'focus';
+      var focusedElement = null;
+      var lastMoveAt = 0;
+
+      function elements() {
+        var nodes = document.querySelectorAll('button, input');
+        var list = [];
+
+        for (var i = 0; i < nodes.length; i += 1) {
+          if (nodes[i].offsetWidth > 0 && nodes[i].offsetHeight > 0) {
+            list.push(nodes[i]);
+          }
+        }
+
+        return list;
+      }
+
+      function setFocus(element) {
+        if (!element) {
+          return;
+        }
+
+        if (focusedElement) {
+          focusedElement.classList.remove(focusClass);
+        }
+
+        focusedElement = element;
+        focusedElement.classList.add(focusClass);
+        focusedElement.focus();
+      }
+
+      function distance(fromRect, toRect, direction) {
+        var fromX = fromRect.left + fromRect.width / 2;
+        var fromY = fromRect.top + fromRect.height / 2;
+        var toX = toRect.left + toRect.width / 2;
+        var toY = toRect.top + toRect.height / 2;
+        var dx = toX - fromX;
+        var dy = toY - fromY;
+
+        if (direction === 'left' && dx >= -5) return Infinity;
+        if (direction === 'right' && dx <= 5) return Infinity;
+        if (direction === 'up' && dy >= -5) return Infinity;
+        if (direction === 'down' && dy <= 5) return Infinity;
+
+        if (direction === 'left' || direction === 'right') {
+          return Math.abs(dx) * 4 + Math.abs(dy);
+        }
+
+        return Math.abs(dy) * 4 + Math.abs(dx);
+      }
+
+      function move(direction) {
+        var now = Date.now();
+        var list = elements();
+        var from;
+        var best = null;
+        var bestDistance = Infinity;
+
+        if (now - lastMoveAt < 120) {
+          return;
+        }
+
+        lastMoveAt = now;
+
+        if (!focusedElement) {
+          setFocus(list[0]);
+          return;
+        }
+
+        from = focusedElement.getBoundingClientRect();
+
+        for (var i = 0; i < list.length; i += 1) {
+          if (list[i] === focusedElement) {
+            continue;
+          }
+
+          var score = distance(from, list[i].getBoundingClientRect(), direction);
+
+          if (score < bestDistance) {
+            best = list[i];
+            bestDistance = score;
+          }
+        }
+
+        if (best) {
+          setFocus(best);
+        }
+      }
+
+      function openUrl(url) {
+        window.location.href = url;
+      }
+
+      function submitFocused() {
+        if (!focusedElement) {
+          setFocus(elements()[0]);
+          return;
+        }
+
+        if (focusedElement.hasAttribute('data-search')) {
+          var value = encodeURIComponent(focusedElement.value || '');
+          if (value) {
+            openUrl('https://www.primevideo.com/search/ref=atv_nb_sr?phrase=' + value);
+          }
+          return;
+        }
+
+        if (focusedElement.getAttribute('data-open')) {
+          openUrl(focusedElement.getAttribute('data-open'));
+          return;
+        }
+
+        focusedElement.click();
+      }
+
+      document.addEventListener('keydown', function (event) {
+        if (event.keyCode === 37) {
+          move('left');
+        } else if (event.keyCode === 38) {
+          move('up');
+        } else if (event.keyCode === 39) {
+          move('right');
+        } else if (event.keyCode === 40) {
+          move('down');
+        } else if (event.keyCode === 13) {
+          submitFocused();
+        } else if (event.keyCode === 10009) {
+          window.history.back();
+        } else {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+      }, true);
+
+      document.addEventListener('click', function (event) {
+        var target = event.target;
+
+        while (target && target !== document.body && !target.getAttribute('data-open')) {
+          target = target.parentNode;
+        }
+
+        if (target && target.getAttribute && target.getAttribute('data-open')) {
+          openUrl(target.getAttribute('data-open'));
+          event.preventDefault();
+        }
+      });
+
+      setFocus(document.querySelector('.primary'));
+    }());
+  </script>
+</body>
+</html>
